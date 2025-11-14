@@ -123,3 +123,36 @@ Rules:
     return [];
   }
 }
+
+/**
+ * Find grammar errors and return corrections as array
+ */
+export async function findGrammarErrors(content, apiKey) {
+  const systemPrompt = `You are a grammar expert. Analyze the text and find grammar/spelling errors.
+Return a JSON array of error objects. Each object must have "error" (the mistake) and "correction" (the fix).
+Example: [{"error": "your wrong", "correction": "you're wrong"}, {"error": "its good", "correction": "it's good"}]
+If no errors found, return an empty array: []
+Return ONLY valid JSON, nothing else.`;
+
+  const response = await callGroqAPI(systemPrompt, content, apiKey);
+  
+  try {
+    // Clean response
+    const cleanedResponse = response
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+    
+    const errors = JSON.parse(cleanedResponse);
+    
+    // Validate structure
+    if (Array.isArray(errors)) {
+      return errors.filter(item => item.error && item.correction);
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Failed to parse grammar errors:', response);
+    return [];
+  }
+}

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { summarizeText, suggestTags, checkGrammar, generateGlossary } from './aiService.js';
+import { summarizeText, suggestTags, checkGrammar, generateGlossary, findGrammarErrors } from './aiService.js';
 
 // Load environment variables
 dotenv.config();
@@ -78,7 +78,7 @@ app.post('/api/ai', async (req, res) => {
         break;
 
       case 'grammar':
-        result = await checkGrammar(content, GROQ_API_KEY);
+        result = await findGrammarErrors(content, GROQ_API_KEY);
         break;
 
       case 'glossary':
