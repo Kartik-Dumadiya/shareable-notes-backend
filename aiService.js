@@ -128,9 +128,15 @@ Rules:
  * Find grammar errors and return corrections as array
  */
 export async function findGrammarErrors(content, apiKey) {
-  const systemPrompt = `You are a grammar expert. Analyze the text and find grammar/spelling errors.
-Return a JSON array of error objects. Each object must have "error" (the mistake) and "correction" (the fix).
-Example: [{"error": "your wrong", "correction": "you're wrong"}, {"error": "its good", "correction": "it's good"}]
+  const systemPrompt = `You are a grammar expert. Analyze the text and find REAL grammar/spelling errors only.
+Return a JSON array of error objects. Each object must have:
+- "error" (the exact mistake found)
+- "correction" (the fix)
+- "explanation" (brief reason for the correction, 5-10 words)
+
+Example: [{"error": "your wrong", "correction": "you're wrong", "explanation": "Contraction of 'you are'"}]
+
+IMPORTANT: Only include actual errors. Do NOT flag correct words as errors.
 If no errors found, return an empty array: []
 Return ONLY valid JSON, nothing else.`;
 
@@ -147,7 +153,7 @@ Return ONLY valid JSON, nothing else.`;
     
     // Validate structure
     if (Array.isArray(errors)) {
-      return errors.filter(item => item.error && item.correction);
+      return errors.filter(item => item.error && item.correction && item.explanation);
     }
     
     return [];
